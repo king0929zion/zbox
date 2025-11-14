@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SIGNING_KEYSTORE_PATH: ${{ github.workspace }}/app/signing-release.jks
-      SIGNING_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      SIGNING_KEYSTORE_PASSWORD: guardianPass123
+      SIGNING_KEY_ALIAS: guardianKey
+      SIGNING_KEY_PASSWORD: guardianKeyPass456
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,15 +27,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Decode keystore
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      - name: Generate signing keystore
         run: |
-          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "ANDROID_KEYSTORE_BASE64 is empty. Please add it in repository settings." >&2
-            exit 1
-          fi
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$SIGNING_KEYSTORE_PATH"
+          keytool -genkeypair \
+            -keystore "$SIGNING_KEYSTORE_PATH" \
+            -storepass "$SIGNING_KEYSTORE_PASSWORD" \
+            -keypass "$SIGNING_KEY_PASSWORD" \
+            -alias "$SIGNING_KEY_ALIAS" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=MessageGuardian, OU=CI, O=Zbox, L=Shenzhen, S=Guangdong, C=CN"
 
       - name: Grant execute permission
         run: chmod +x gradlew

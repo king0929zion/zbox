@@ -61,6 +61,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.google.android.material:material:1.12.0")
 
     implementation(composeBom)
     androidTestImplementation(composeBom)
